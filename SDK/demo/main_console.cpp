@@ -126,8 +126,8 @@ int  main()
 
 //	pRgb=cvCreateImage(cvSize(getWidth(),getHeight()), IPL_DEPTH_8U, 1);
 
-	setValue(CONTROL_EXPOSURE, 33*1000, true); //auto exposure
-	setValue(CONTROL_GAIN,50, true); //auto exposure
+	setValue(CONTROL_EXPOSURE, 10*1000, false); //auto exposure
+	setValue(CONTROL_GAIN,50, false); //auto exposure
 	setValue(CONTROL_BANDWIDTHOVERLOAD, getMin(CONTROL_BANDWIDTHOVERLOAD), false); //lowest transfer speed
 
 	startCapture(); //start privew
@@ -139,9 +139,8 @@ int  main()
 	{
 
 		//getImageData((unsigned char*)pRgb->imageData, pRgb->imageSize, -1);
-		getImageData(pdata,width*height , -1);
-
-		count++;
+		if(getImageData(pdata,width*height , -1))
+			count++;
 		time2 = GetTickCount();
 		if(time2-time1 > 1000 )
 		{

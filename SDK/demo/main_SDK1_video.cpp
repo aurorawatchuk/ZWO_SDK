@@ -26,8 +26,8 @@ void cvText(IplImage* img, const char* text, int x, int y)
 
 	cvPutText(img, text, textPos, &font,textColor);
 }
-
-unsigned long GetTickCount()
+extern unsigned long GetTickCount();
+/*unsigned long GetTickCount()
 {
 
 #ifdef _MAC
@@ -44,7 +44,7 @@ unsigned long GetTickCount()
    return (ts.tv_sec*1000 + ts.tv_nsec/(1000*1000));
 #endif
 
-}
+}*/
 int bDisplay = 0;
 int bMain = 1;
 int bChangeFormat = 0;
@@ -195,10 +195,13 @@ int  main()
 	else
 		pRgb=cvCreateImage(cvSize(getWidth(),getHeight()), IPL_DEPTH_8U, 1);
 
-	setValue(CONTROL_EXPOSURE, 100*1000, false); //ms//auto
+	int exp_ms;
+	printf("Please input exposure time(ms)\n");
+	scanf("%d", &exp_ms);
+	setValue(CONTROL_EXPOSURE, exp_ms*1000, false);
 	setValue(CONTROL_GAIN,getMin(CONTROL_GAIN), false); 
 	setValue(CONTROL_BANDWIDTHOVERLOAD, getMin(CONTROL_BANDWIDTHOVERLOAD), false); //low transfer speed
-
+	setValue(CONTROL_HIGHSPEED, 0, false);
 	setValue(CONTROL_WB_B, 90, false);
  	setValue(CONTROL_WB_R, 48, false);
   	setAutoPara(getMax(CONTROL_GAIN)/2,10,150); //max auto gain and exposure and target brightness
@@ -226,12 +229,13 @@ int  main()
 	{
 
 //		time0 = GetTickCount();
-		getImageData((unsigned char*)pRgb->imageData, pRgb->imageSize, 200);
+		if(getImageData((unsigned char*)pRgb->imageData, pRgb->imageSize, exp_ms<=100?200:exp_ms*2))
+					count++;
 
 //		bGetImg = getImageData((unsigned char*)pRgb->imageData, pRgb->imageSize, iWaitMs);
 		time2 = GetTickCount();
 //		printf("waitMs%d, deltaMs%d, %d\n", iWaitMs, time2 - time0, bGetImg);
-		count++;
+
 		
 		if(time2-time1 > 1000 )
 		{

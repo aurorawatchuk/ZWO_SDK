@@ -94,7 +94,7 @@ END:
 int  main()
 {
 	int width;
-	char* bayer[] = {"RG","BG","GR","GB"};
+	const char* bayer[] = {"RG","BG","GR","GB"};
 
 	int height;
 	int i;
@@ -110,8 +110,6 @@ int  main()
 	
 
 	IplImage *pRgb;
-
-
 
 	int numDevices = ASIGetNumOfConnectedCameras();
 	if(numDevices <= 0)
@@ -187,7 +185,7 @@ int  main()
 	printf("\nset image format %d %d %d %d success, start privew, press ESC to stop \n", width, height, bin, Image_type);
 
 	ASIGetROIFormat(CamNum, &width, &height, &bin, (ASI_IMG_TYPE*)&Image_type);
-	int displayWid = 640, displayHei = 480;
+	int displayWid = 1280, displayHei = 960;
 	if(Image_type == ASI_IMG_RAW16)
 		pRgb=cvCreateImage(cvSize(displayWid, displayHei), IPL_DEPTH_16U, 1);
 	else if(Image_type == ASI_IMG_RGB24)
@@ -216,6 +214,7 @@ int  main()
 	pthread_t thread_display;
 	pthread_create(&thread_display, NULL, Display, (void*)pRgb);
 #elif defined _WINDOWS
+
 	HANDLE thread_setgainexp;
 	thread_setgainexp = (HANDLE)_beginthread(Display,  NULL, (void*)pRgb);
 #endif
@@ -226,6 +225,7 @@ int  main()
 
 	ASI_EXPOSURE_STATUS status;
 	int iDropped = 0;
+	//bool bSave = true;
 	while(bMain)
 	{
 
@@ -240,6 +240,8 @@ int  main()
 		if(status == ASI_EXP_SUCCESS)
 		{
 			ASIGetDataAfterExp(CamNum, imgBuf, imgSize);
+			// sprintf(szTemp, "saveImage%d.jpg", bMain);
+			
 			if(Image_type==ASI_IMG_RAW16)
 			{
 				unsigned short *pCv16bit = (unsigned short *)(pRgb->imageData);
@@ -260,6 +262,9 @@ int  main()
 					pCv8bit+=displayWid;
 					pImg8bit+=width;
 				}
+			/*	if(bSave)
+   					cvSaveImage("saveImage.jpg", pRgb);
+				bSave = false;*/
 			}
 					
 		}
@@ -270,13 +275,12 @@ int  main()
 		
 		if(time2-time1 > 1000 )
 		{
-			ASIGetDroppedFrames(CamNum, &iDropped);
-			sprintf(buf, "fps:%d dropped frames:%lu ImageType:%d",count, iDropped, Image_type);
+			ASIGetDroppedFrames(CamNum, &iDropped);			
 
 			count = 0;
 			time1=GetTickCount();	
-			printf(buf);
-			printf("\n");
+			printf("fps:%d dropped frames:%d ImageType:%d\n",count, iDropped, Image_type);
+	
 
 		}
 		if(Image_type != ASI_IMG_RGB24 && Image_type != ASI_IMG_RAW16)

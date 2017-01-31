@@ -4,8 +4,8 @@ platform = x86
 CC = g++
 #INCLIB = /usr/local/include
 #LDLIB = /usr/local/lib
-OPENCV = $(shell pkg-config --cflags opencv) $(shell pkg-config --libs opencv)
-USB =  -I../libusb/include  -L../libusb/$(platform) -lusb-1.0  
+OPENCV = $(shell pkg-config --cflags opencv) $(shell pkg-config --libs opencv) -I/usr/include/opencv2
+#USB =  -I../libusb/include  -L../libusb/$(platform) -lusb-1.0  
 
 
 
@@ -15,10 +15,10 @@ LIBSPATH = -L../lib/$(platform) -I../include
 
 ifeq ($(ver), debug)
 DEFS = -D_LIN -D_DEBUG 
-CFLAGS = -g  -I $(INCLIB) -L $(LDLIB) $(DEFS) $(COMMON) $(LIBSPATH)  -lpthread  $(USB) -DGLIBC_20
+CFLAGS = -g  -I $(INCLIB) -L $(LDLIB) $(DEFS) $(COMMON) $(LIBSPATH)  -lpthread  -DGLIBC_20
 else
 DEFS = -D_LIN 
-CFLAGS =  -O3 -I $(INCLIB) -L $(LDLIB) $(DEFS) $(COMMON) $(LIBSPATH)  -lpthread  $(USB) -DGLIBC_20
+CFLAGS =  -O3 -I $(INCLIB) -L $(LDLIB) $(DEFS) $(COMMON) $(LIBSPATH)  -lpthread  -DGLIBC_20
 endif
 
 ifeq ($(platform), mac32)
